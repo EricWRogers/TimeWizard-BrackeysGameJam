@@ -6,17 +6,22 @@ public class World : Node2D
     private bool canRewind = true;
     private Node2D timePoint = null;
     private KinematicBody2D player = null;
+    private Timer resetRewindTimer = null;
     public override void _Ready()
     {
         player = GetNode<KinematicBody2D>("Player");
-        player.Connect("PlaceTimePoint", this, "SetTimePoint");
         timePoint = GetNode<Node2D>("TimePoint");
+        resetRewindTimer = GetNode<Timer>("ResetRewindTimer");
+
+        player.Connect("PlaceTimePoint", this, "SetTimePoint");
+        player.Connect("TryToRewind", this, "TryToRewind");
+        resetRewindTimer.Connect("timeout", this, "ResetCanRewind");
     }
 
     public override void _Input(InputEvent @event)
     {
-        if(Input.IsActionJustPressed("action_rewind"))
-            player.GlobalPosition = timePoint.GlobalPosition;
+        
+            
     }
 
     private void SetTimePoint(Vector2 pos)
@@ -26,9 +31,19 @@ public class World : Node2D
 
     private void TryToRewind(bool isPlayerDying)
     {
-        if(canRewind)
-        {
-            
+        if(canRewind) {
+            player.GlobalPosition = timePoint.GlobalPosition;
+            canRewind = false;
+            resetRewindTimer.Start(0.4f);
+            (player as Player).RewindStatus(false);
+        } else if (isPlayerDying){
+            GetTree().ChangeScene("res://scene/World.tscn");
         }
+    }
+
+    private void ResetCanRewind()
+    {
+        (player as Player).RewindStatus(true);
+        canRewind = true;
     }
 }

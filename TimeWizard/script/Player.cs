@@ -5,6 +5,12 @@ public class Player : KinematicBody2D
 {
     [Signal]
     public delegate void PlaceTimePoint(Vector2 pos);
+
+    [Signal]
+    public delegate void TryToRewind(bool isPlayerDying);
+
+    [Export] public Texture ManaFull = null;
+    [Export] public Texture ManaEmpty = null;
     public float Acceleration = 512;
     public float MaxSpeed = 64;
     public float Friction = 8f;
@@ -24,6 +30,9 @@ public class Player : KinematicBody2D
     {
         if(Input.IsActionJustPressed("action_place_point"))
             EmitSignal("PlaceTimePoint", GlobalPosition);
+        if(Input.IsActionJustPressed("action_rewind"))
+            EmitSignal("TryToRewind", false);
+
         Movement(delta);
     }
 
@@ -65,11 +74,6 @@ public class Player : KinematicBody2D
             }
         }
 
-        
-
-        
-        
-
         if(Input.IsActionJustReleased("move_jump") && motion.y < -JumpForce/2) {
             motion.y = -JumpForce/2;
         }
@@ -87,5 +91,13 @@ public class Player : KinematicBody2D
         }*/
 
         motion = MoveAndSlide(motion,Vector2.Up);
+    }
+
+    public void RewindStatus(bool canRewind)
+    {
+        if(canRewind)
+            sprite.Texture = ManaFull;
+        else
+            sprite.Texture = ManaEmpty;
     }
 }
