@@ -48,23 +48,43 @@ public class Player : KinematicBody2D
 
         motion.y += Gravity * delta;
 
-        //if(TestMove(transform, Vector2.Down)) {
-        if(IsOnFloor() || IsOnWall()) { // Wall Jump
-            JumpCount = 0;
-        } else {
-            if(Input.IsActionJustReleased("move_jump") && motion.y < -JumpForce/2) {
-                motion.y = -JumpForce/2;
+        if(Input.IsActionJustPressed("move_jump"))
+        {
+            if(TestMove(Transform, Vector2.Down)) {
+                motion.y = -JumpForce;
+            } else {
+                if(TestMove(Transform, Vector2.Left)) {
+                    motion.y = -JumpForce;
+                    motion.x = JumpForce;
+                    sprite.FlipH = false;
+                } else if(TestMove(Transform, Vector2.Right)) {
+                    motion.y = -JumpForce;
+                    motion.x = -JumpForce;
+                    sprite.FlipH = true;
+                }
             }
         }
-            
+
         
+
+        
+        
+
+        if(Input.IsActionJustReleased("move_jump") && motion.y < -JumpForce/2) {
+            motion.y = -JumpForce/2;
+        }
+        
+            
+        /*if(IsOnFloor() || IsOnWall()) { // Wall Jump
+            JumpCount = 0;
+        }
         if(JumpCount < 1) {
             if(Input.IsActionJustPressed("move_jump"))
             {
                 motion.y = -JumpForce;
                 JumpCount++;
             }
-        }
+        }*/
 
         motion = MoveAndSlide(motion,Vector2.Up);
     }
